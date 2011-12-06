@@ -51,7 +51,8 @@ let time f () =
   let t2 = Unix.gettimeofday () in 
   t2 -. t1 
 
-let create () = "coucou"
+type t = { cnt : string ; bval : int ; visible : bool } 
+let create () =  { cnt = "coucou" ; bval = 1; visible = false } 
 
 
 let print_stats () = 
@@ -73,17 +74,19 @@ let test3 n =
     print_stats () ;
     debug "gc took %f seconds" t 
 
-type t = { cnt : string } 
+
 
 let test4 () = 
-  let i = { cnt = "coucou" } in 
+  let i = { cnt = "coucou" ; bval = 1; visible = false } in 
   print_stats () ;
   let j = Eternal.copy i in
+  Gc.full_major () ;
+  Gc.full_major () ;
   print_stats () ;
   debug "> %s" j.cnt 
 
 let _ = 
-  test4 () ; 
+  test3 100000 ; 
   debug "> collected, exiting" 
     
   

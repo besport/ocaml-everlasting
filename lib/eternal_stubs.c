@@ -33,6 +33,13 @@
 #define Is_blue_hd(hd) (Color_hd (hd) == Caml_blue)
 #define Is_black_hd(hd) (Color_hd (hd) == Caml_black)
 
+/* This depends on the layout of the header.  See [mlvalues.h]. */
+#define Make_header(wosize, tag, color)                                       \
+      (/*Assert ((wosize) <= Max_wosize),*/                                   \
+       ((header_t) (((header_t) (wosize) << 10)                               \
+                    + (color)                                                 \
+                    + (tag_t) (tag)))                                         \
+      )
 
 #endif
 
@@ -117,17 +124,59 @@ void ocaml_set (value e, value pos, value v) {
 
 
 value ocaml_copy (value e) {
-  // CAMLparam1(e) ; 
   
-  
-  
-  return (e) ; 
-
+  // CAMLparam1(e) ;
+  if Is_block (e) 
+    {
+      // Handling block
+      //printf ("it's a block\n") ;
+      switch (Tag_val(e))
+        {
+        case Closure_tag: { printf ("closure_tag\n"); break;  }
+        case String_tag: { 
+          // printf ("string_tag\n");
+          
+          value result ; 
+          
+          mlsize_t wosize = (caml_string_length (e) + sizeof (value)) / sizeof (value);
+          // attention, what happens if it is too long ?
+          void *ptr = (void *) malloc (Bhsize_wosize (wosize) * sizeof (int)) ; 
+          
+          Hd_hp (ptr) = Make_header (wosize, String_tag, Caml_black) ;  
+          
+          result = Val_hp (ptr) ; 
+          memmove (String_val(result), String_val (e), caml_string_length (e)) ;  
+          return result ;
+        }
+        case Double_tag: { printf ("closure_tag\n"); break;  }
+        case Double_array_tag: { printf ("closure_tag\n"); break;  }
+        case Abstract_tag: { printf ("closure_tag\n"); break;  }
+        case Custom_tag: { printf ("closure_tag\n"); break;  }
+        default: 
+          {
+            printf ("> default, it's a block (%d) %d", No_scan_tag, Tag_val(e)); 
+            return e ;
+          }
+        }
+      
+    }
+  else 
+    {
+     
+      return e ; 
+    }
 }
 
 
 /*
 
+      value b = caml_alloc (Wosize_val (e), Tag_val (e)) ; 
+      int i; 
+      for (i=0; i < Wosize_val (e); i++)
+        {
+          Store_field (b, i, ocaml_copy (Field (e, i))); 
+        }; 
+      return b ;
 // Perform the lookup 
 
 static const char * _mk_NA( const char * p ){

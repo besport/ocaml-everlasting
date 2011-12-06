@@ -6,6 +6,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
@@ -62,7 +63,30 @@ value ocaml_update (value legacy, value latest) {
           {
           case Closure_tag: { caml_invalid_argument("Can't update Closure_tag blocks") ; break; }
           case Abstract_tag: { caml_invalid_argument("Can't update Abstract_tag blocks") ; break;  }
-          case Custom_tag: { caml_invalid_argument("Can't update Custom_tag blocks") ; break;  }
+          case Custom_tag: { 
+            printf ("custom tag\n"); 
+            
+            if ((Wosize_val (legacy) == Wosize_val (latest)) && (!(memcmp (Data_custom_val(legacy), Data_custom_val(latest), Wosize_val (legacy)))))
+              {
+                return legacy ;
+              }
+            else 
+              {
+                value result ; 
+                
+                // Copying custom tags. it might be the tricky part 
+                Alloc_small_nogc(result, Wosize_val (latest), Custom_tag);
+                Custom_ops_val(result) = Custom_ops_val(latest); // I imagine that it's a global value
+                
+                // Copying the custom data 
+                memmove(Data_custom_val(result), Data_custom_val(latest), Wosize_val(latest)) ; 
+                Free_small_nogc (legacy); 
+                return result ;
+                
+              }
+            
+
+          }
             
           case String_tag: { 
             // printf ("string_tag\n");

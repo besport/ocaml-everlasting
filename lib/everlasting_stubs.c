@@ -62,12 +62,12 @@ value ocaml_copy (value e) {
   if Is_block (e) 
     {
       // Handling block
-      //printf ("it's a block\n") ;
+      
       switch (Tag_val(e))
         {
         case Closure_tag: { caml_invalid_argument("Can't copy Closure_tag blocks") ; break; }
         case String_tag: { 
-          // printf ("string_tag\n");
+          
           
           mlsize_t len ; 
           value result ; 
@@ -85,7 +85,7 @@ value ocaml_copy (value e) {
           
         }
         case Double_tag: {
-          printf ("double_tag\n");
+          
           value result ; 
           Alloc_small_nogc(result, Double_wosize, Double_tag); 
           Store_double_val (result, Double_val (e)); 
@@ -93,7 +93,7 @@ value ocaml_copy (value e) {
         }
         case Double_array_tag: 
           {
-            printf ("double array tag\n");
+            
             value result ;
             Alloc_small_nogc(result, Wosize_val (e), Double_array_tag); 
             int i; 
@@ -105,7 +105,7 @@ value ocaml_copy (value e) {
           }
         case Abstract_tag: { caml_invalid_argument("Can't copy Abstract_tag blocks") ; break;  }
         case Custom_tag: { 
-          printf ("custom tag\n"); 
+          
           value result ; 
           
           // Copying custom tags. it might be the tricky part 
@@ -118,7 +118,7 @@ value ocaml_copy (value e) {
           return result;  }
         default: 
           {
-            printf ("> code\n"); 
+            
             value result; 
             Alloc_small_nogc(result, Wosize_val (e), Tag_val (e)) ; 
             int i; 
@@ -148,7 +148,7 @@ value ocaml_update (value legacy, value latest) {
           case Closure_tag: { caml_invalid_argument("Can't update Closure_tag blocks") ; break; }
           case Abstract_tag: { caml_invalid_argument("Can't update Abstract_tag blocks") ; break;  }
           case Custom_tag: { 
-            printf ("custom tag\n"); 
+            
             
             if ((Wosize_val (legacy) == Wosize_val (latest)) && (!(memcmp (Data_custom_val(legacy), Data_custom_val(latest), Wosize_val (legacy)))))
               {
@@ -173,7 +173,7 @@ value ocaml_update (value legacy, value latest) {
           }
             
           case String_tag: { 
-            // printf ("string_tag\n");
+            
             
             if (!strcmp (String_val (legacy), String_val (latest)))
               return legacy ; 
@@ -255,7 +255,7 @@ struct eternal
 
 void finalize (value v) {
   struct eternal *t = Eternal_val(v) ;
-  printf ("> finalize me!\n"); 
+  
   if (t->data) free (t->data); 
   return ;
 }
@@ -290,7 +290,7 @@ value ocaml_create (value size) {
 
 value ocaml_get (value e, value pos) {
   CAMLparam2(e, pos);
-  printf ("> get\n");   
+
   if (!(Eternal_val(e)->data[Int_val (pos)])) { caml_invalid_argument("There is no such element") ; }
   CAMLreturn (Eternal_val(e)->data[Int_val (pos)]) ; 
 }
@@ -298,7 +298,7 @@ value ocaml_get (value e, value pos) {
 
 void ocaml_set (value e, value pos, value v) {
   CAMLparam3(e, pos, v); 
-  printf ("> set\n");   
+ 
   int p = Int_val (pos) ;
   
   struct eternal *t = Eternal_val (e) ; 
@@ -312,7 +312,7 @@ void ocaml_set (value e, value pos, value v) {
 
 void ocaml_replace (value e, value pos, value v){
   CAMLparam3 (e, pos, v); 
-  printf ("> replace\n"); 
+  
   
   int p = Int_val (pos) ; 
   struct eternal *t = Eternal_val (e) ; 

@@ -75,18 +75,18 @@ let test3 n =
     debug "gc took %f seconds" t 
 
 
-
+type i  = float array  
 let test4 () = 
-  let i = { cnt = "coucou" ; bval = 1; visible = false } in 
+  let i = [| 0.0 ; 4.12; 12.21 |] in
   print_stats () ;
   let j = Eternal.copy i in
   Gc.full_major () ;
   Gc.full_major () ;
   print_stats () ;
-  debug "> %s" j.cnt 
+  debug "> %d %f" (Array.length j) j.(2)
 
 let _ = 
-  test3 100000 ; 
+  test4 () ;  
   debug "> collected, exiting" 
     
   

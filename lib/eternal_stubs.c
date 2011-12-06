@@ -129,7 +129,7 @@ void ocaml_set (value e, value pos, value v) {
 
 
 #define Alloc_small_nogc(result,wosize,tag)                             \
-          void *ptr = (void *) malloc (Bhsize_wosize (wosize) * sizeof (int)) ;\
+          void *ptr = (void *) malloc (Bhsize_wosize (wosize) * sizeof (int)) ; \
           Hd_hp (ptr) = Make_header (wosize, tag, Caml_black) ;\
           result = Val_hp (ptr) ;
 
@@ -152,13 +152,30 @@ value ocaml_copy (value e) {
           wosize = (caml_string_length (e) + sizeof (value)) / sizeof (value);
           
           Alloc_small_nogc(result, wosize, String_tag)
-
+            
           memmove (String_val(result), String_val (e), caml_string_length (e)) ;  
           return result ;
-        
+          
         }
-        case Double_tag: { printf ("closure_tag\n"); break;  }
-        case Double_array_tag: { printf ("closure_tag\n"); break;  }
+        case Double_tag: {
+          printf ("double_tag\n");
+          value result ; 
+          Alloc_small_nogc(result, Double_wosize, Double_tag); 
+          Store_double_val (result, Double_val (e)); 
+          return result ; 
+        }
+        case Double_array_tag: 
+          {
+            printf ("double array tag\n");
+            value result ;
+            Alloc_small_nogc(result, Wosize_val (e), Double_array_tag); 
+            int i; 
+            for (i=0; i < Wosize_val (e); i++)
+              {
+                Store_double_field(result, i, Double_field(e, i)); 
+              }; 
+            return result; 
+          }
         case Abstract_tag: { printf ("closure_tag\n"); break;  }
         case Custom_tag: { printf ("closure_tag\n"); break;  }
         default: 

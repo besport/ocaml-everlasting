@@ -105,16 +105,17 @@ value ocaml_copy (value e) {
           }
         case Abstract_tag: { caml_invalid_argument("Can't copy Abstract_tag blocks") ; break;  }
         case Custom_tag: { 
-          
           value result ; 
-          
+        
           // Copying custom tags. it might be the tricky part 
           Alloc_small_nogc(result, Wosize_val (e), Custom_tag);
-          Custom_ops_val(result) = Custom_ops_val(e); // I imagine that it's a global value
+          Custom_ops_val(result) = Custom_ops_val(e); // I imagine that it's a global value, anyway it's useless 
           
           // Copying the custom data 
-          memmove(Data_custom_val(result), Data_custom_val(e), Wosize_val(e)) ; 
           
+          Int64_val(result) = Int64_val(e) ; 
+          
+        
           return result;  }
         default: 
           {
@@ -152,18 +153,22 @@ value ocaml_update (value legacy, value latest) {
             
             if ((Wosize_val (legacy) == Wosize_val (latest)) && (!(memcmp (Data_custom_val(legacy), Data_custom_val(latest), Wosize_val (legacy)))))
               {
+
+                
                 return legacy ;
               }
             else 
               {
-                value result ; 
                 
+                value result ; 
+        
                 // Copying custom tags. it might be the tricky part 
-                Alloc_small_nogc(result, Wosize_val (latest), Custom_tag);
-                Custom_ops_val(result) = Custom_ops_val(latest); // I imagine that it's a global value
+                Alloc_small_nogc(result, Wosize_val (legacy), Custom_tag);
+                Custom_ops_val(result) = Custom_ops_val(legacy); // I imagine that it's a global value, anyway it's useless 
                 
                 // Copying the custom data 
-                memmove(Data_custom_val(result), Data_custom_val(latest), Wosize_val(latest)) ; 
+                
+                Int64_val(result) = Int64_val(legacy) ; 
                 Free_small_nogc (legacy); 
                 return result ;
                 

@@ -43,88 +43,6 @@
 
 #endif
 
-// type definition 
-struct eternal 
-{
-  value **data ;
-
-}; 
-
-// Handle the eternal struct
-#define Eternal_val(v) (*((struct eternal **) Data_custom_val(v))) 
-
-void finalize (value v) {
-  struct eternal *t = Eternal_val(v) ;
-  printf ("> finalize me!\n"); 
-  if (t->data) free (t->data); 
-  return ;
-}
- 
-static struct custom_operations context = {
-  "eternal.t",
-  //(void *)finalize,
-  finalize,
-  custom_compare_default,
-  custom_hash_default,
-  custom_serialize_default,
-  custom_deserialize_default
-};
-
-value alloc_eternal (struct eternal *t) {
-  value v = alloc_custom(&context, sizeof(struct eternal*), 0, 1);
-  Eternal_val (v) = t;
-  return v;
-};
-
-// Create the context 
-
-value ocaml_create (value size) {
-  CAMLparam1(size);
-
-  struct eternal *t = (struct eternal *)malloc ((sizeof (struct eternal))) ; 
-  t->data = (value **)malloc (sizeof (value **) * Int_val(size)) ; 
-  CAMLreturn (alloc_eternal (t)); 
-}
-
-// create eternal references 
-
-value ocaml_t1 (value v) {
-  CAMLparam1 (v); 
-  CAMLlocal1 (b) ; 
-  b = caml_alloc (1, 0) ;
-  caml_register_global_root(&b) ;
-
-  printf ("--> tag white %d gray %d  blue %d   black %d  %d\n", Caml_white, Caml_gray, Caml_blue, Caml_black, Color_val(v));  
-   
-  Store_field (b, 0, v); 
-  CAMLreturn (b) ;
-}
-
-// Get and set
-
-value ocaml_unsafe_get (value e, value pos) {
-  CAMLparam2(e, pos); 
-  CAMLreturn(*(Eternal_val(e)->data[Int_val (pos)])) ; 
-}
-
-
-void ocaml_set (value e, value pos, value v) {
-  CAMLparam2(e, pos); 
-  
-  int p = Int_val (pos) ;
-  
-  printf ("--> tag white %d gray %d  blue %d   black %d  %d\n", Caml_white, Caml_gray, Caml_blue, Caml_black, Color_val(v));  
-  
-  struct eternal *t = Eternal_val (e) ; 
-  
-  (t->data) [ p ] = &v ; /* this does not work as gc relocate the values */
-
-  CAMLreturn0 ;
-}
-
-
-
-
 /* Copy OCaml blocks outside of the heap */
 
 
@@ -142,7 +60,7 @@ value ocaml_copy (value e) {
       //printf ("it's a block\n") ;
       switch (Tag_val(e))
         {
-        case Closure_tag: { printf ("closure_tag\n"); break;  }
+        case Closure_tag: { caml_invalid_argument("Can't copy Closure_tag blocks") ; break; }
         case String_tag: { 
           // printf ("string_tag\n");
           
@@ -176,8 +94,8 @@ value ocaml_copy (value e) {
               }; 
             return result; 
           }
-        case Abstract_tag: { printf ("closure_tag\n"); break;  }
-        case Custom_tag: { printf ("closure_tag\n"); break;  }
+        case Abstract_tag: { caml_invalid_argument("Can't copy Abstract_tag blocks") ; break;  }
+        case Custom_tag: { caml_invalid_argument("Can't copy Custom_tag blocks") ; break;  }
         default: 
           {
             printf ("> code\n"); 
@@ -196,21 +114,76 @@ value ocaml_copy (value e) {
     }
   else 
     {
-      printf ( "straight\n" ); 
-     
       return e ; 
     }
 }
 
 
-/*
+// type definition 
+struct eternal 
+{
+  void **data ;
+}; 
 
-      value b = caml_alloc (Wosize_val (e), Tag_val (e)) ; 
-      int i; 
-      for (i=0; i < Wosize_val (e); i++)
-        {
-          Store_field (b, i, ocaml_copy (Field (e, i))); 
-        }; 
-      return b ;
+// Handle the eternal struct
 
-*/
+#define Eternal_val(v) (*((struct eternal **) Data_custom_val(v))) 
+
+void finalize (value v) {
+  struct eternal *t = Eternal_val(v) ;
+  printf ("> finalize me!\n"); 
+  if (t->data) free (t->data); 
+  return ;
+}
+ 
+static struct custom_operations context = {
+  "eternal.t",
+  //(void *)finalize,
+  finalize,
+  custom_compare_default,
+  custom_hash_default,
+  custom_serialize_default,
+  custom_deserialize_default
+};
+
+value alloc_eternal (struct eternal *t) {
+  value v = alloc_custom(&context, sizeof(struct eternal*), 0, 1);
+  Eternal_val (v) = t;
+  return v;
+};
+
+// Create the context 
+
+value ocaml_create (value size) {
+  CAMLparam1(size);
+
+  struct eternal *t = (struct eternal *)malloc ((sizeof (struct eternal))) ; 
+  t->data = (void **)calloc (Int_val(size), sizeof (void *)) ; /* use calloc to zero the memory, it's slower but muuuch safer in our case */
+  CAMLreturn (alloc_eternal (t)); 
+}
+
+// Get and set
+
+value ocaml_get (value e, value pos) {
+  CAMLparam2(e, pos);
+  if (!(Eternal_val(e)->data[Int_val (pos)])) { caml_invalid_argument("There is no such element") ; }
+  CAMLreturn (Eternal_val(e)->data[Int_val (pos)]) ; 
+}
+
+
+void ocaml_set (value e, value pos, value v) {
+  CAMLparam2(e, pos); 
+  
+  int p = Int_val (pos) ;
+  
+  struct eternal *t = Eternal_val (e) ; 
+  
+  (t->data) [ p ] = ocaml_copy (v) ; /* this does not work as gc relocate the values */
+
+  CAMLreturn0 ;
+}
+
+
+
+
+

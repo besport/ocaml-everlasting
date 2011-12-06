@@ -77,14 +77,20 @@ let test3 n =
 
 type i  = { uids : float list; visible : bool ; a : int ; }
 let test4 () = 
-  let i = { uids = [ 1.0 ; 3.1 ; 1.4 ]; visible = true ; a = 12 } in
+  let i = (fun () -> ()) in
   print_stats () ;
   let j = Eternal.copy i in
-  print_stats () ;
-  debug "> %d %B" (List.length j.uids) j.visible
+  print_stats () 
+
+
+let test5 () = 
+  let eternal = Eternal.create 10 in 
+  Eternal.set eternal 0 [ 1; 2; 3] ; 
+  let i = Eternal.get eternal 0 in
+  List.iter print_int i
 
 let _ = 
-  test4 () ;  
+  test5 () ;  
   debug "> collected, exiting" 
     
   

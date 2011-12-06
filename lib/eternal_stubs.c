@@ -123,6 +123,16 @@ void ocaml_set (value e, value pos, value v) {
 }
 
 
+
+
+/* Copy OCaml blocks outside of the heap */
+
+
+#define Alloc_small_nogc(result,wosize,tag)                             \
+          void *ptr = (void *) malloc (Bhsize_wosize (wosize) * sizeof (int)) ;\
+          Hd_hp (ptr) = Make_header (wosize, tag, Caml_black) ;\
+          result = Val_hp (ptr) ;
+
 value ocaml_copy (value e) {
   
   // CAMLparam1(e) ;
@@ -137,16 +147,15 @@ value ocaml_copy (value e) {
           // printf ("string_tag\n");
           
           value result ; 
+          mlsize_t wosize ; 
+
+          wosize = (caml_string_length (e) + sizeof (value)) / sizeof (value);
           
-          mlsize_t wosize = (caml_string_length (e) + sizeof (value)) / sizeof (value);
-          // attention, what happens if it is too long ?
-          void *ptr = (void *) malloc (Bhsize_wosize (wosize) * sizeof (int)) ; 
-          
-          Hd_hp (ptr) = Make_header (wosize, String_tag, Caml_black) ;  
-          
-          result = Val_hp (ptr) ; 
+          Alloc_small_nogc(result, wosize, String_tag)
+
           memmove (String_val(result), String_val (e), caml_string_length (e)) ;  
           return result ;
+        
         }
         case Double_tag: { printf ("closure_tag\n"); break;  }
         case Double_array_tag: { printf ("closure_tag\n"); break;  }

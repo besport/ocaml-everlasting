@@ -69,14 +69,18 @@ value ocaml_copy (value e) {
         case String_tag: { 
           // printf ("string_tag\n");
           
+          mlsize_t len ; 
           value result ; 
+          mlsize_t offset_index;
           mlsize_t wosize ; 
-
-          wosize = (caml_string_length (e) + sizeof (value)) / sizeof (value);
+          len = caml_string_length (e) ; 
+          wosize = (len + sizeof (value)) / sizeof (value);
           
-          Alloc_small_nogc(result, wosize, String_tag)
-            
-          memmove (String_val(result), String_val (e), caml_string_length (e)) ;  
+          Alloc_small_nogc(result, wosize, String_tag); 
+          Field (result, wosize - 1) = 0;
+          offset_index = Bsize_wsize (wosize) - 1;
+          Byte (result, offset_index) = offset_index - len;
+          memmove (String_val(result), String_val (e), len) ;  
           return result ;
           
         }
@@ -175,14 +179,19 @@ value ocaml_update (value legacy, value latest) {
               return legacy ; 
             else 
               {
-                value result ;
+                mlsize_t len ; 
+                value result ; 
+                mlsize_t offset_index;
                 mlsize_t wosize ; 
+                len = caml_string_length (latest) ; 
+                wosize = (len + sizeof (value)) / sizeof (value);
+          
+                Alloc_small_nogc(result, wosize, String_tag); 
+                Field (result, wosize - 1) = 0;
+                offset_index = Bsize_wsize (wosize) - 1;
+                Byte (result, offset_index) = offset_index - len;
+                memmove (String_val(result), String_val (latest), len) ;  
                 
-                wosize = (caml_string_length (latest) + sizeof (value)) / sizeof (value);
-                
-                Alloc_small_nogc(result, wosize, String_tag) ; 
-                  
-                memmove (String_val(result), String_val (latest), caml_string_length (latest)) ;
                 Free_small_nogc(legacy); 
                 
                 return result ;

@@ -8,5 +8,6 @@ external get : 'a t -> int -> 'a  = "ocaml_get"
 
 (** copy an ocaml element outside of the heap, to use with some care .. *)
 external copy : 'a -> 'a = "ocaml_copy" 
-    
+(** update an element outside of the heap with an element inside the heap *)
+external update : 'a -> 'a -> 'a = "ocaml_update"    
    

@@ -1,96 +1,30 @@
 let debug fmt = Printf.ksprintf print_endline fmt
 
-
-type u = 
-    {
-      cnt : int ; 
-      label : string ;
-    }
-
-let _ = 
-  Random.self_init () 
-
-let create () = 
-  { cnt = Random.int 1000  ; label = "coucou" } 
-
-(*
-let test1 () = 
-  Random.self_init () ; 
-  debug "> eternal"  ; 
-  
-  let t = Eternal.create 10 in  
-  
-  Gc.full_major (); 
-  debug "> set elt" ; 
-  let u = (create ()) in
-  Eternal.set t 0 u ; 
-  Gc.full_major (); 
-  
-  let e = Eternal.unsafe_get t 0 in 
-  debug "> found elt %d" e.cnt  ;    
-  
-  let e = Eternal.unsafe_get t 0 in 
-      
-  debug "> store created" ; 
-  Gc.full_major (); 
-  debug "> collected" 
-*)
-
-(*
-let test2 () = 
-  debug "about to create an eternal reference" ; 
-  let a = Eternal.t1 (create ()) in 
-  debug "it's created, now accessing it"; 
-  debug "> created element %d" (!a).cnt 
-*)
-
-
 let time f () = 
   let t1 = Unix.gettimeofday () in 
   f () ; 
   let t2 = Unix.gettimeofday () in 
   t2 -. t1 
 
-type t = { cnt : string ; bval : int ; visible : bool } 
-let create () =  { cnt = "coucou" ; bval = 1; visible = false } 
-
-
-let print_stats () = 
-  let open Gc in 
-      let stats = Gc.stat () in
-      debug "minor_words %f live_words %d" stats.minor_words stats.live_words
-
-let test3 n = 
-  let e = ref [] in
-  let _ = 
-    for i = 0 to n do
-      let c =  Eternal.copy (create ()) in 
-      e := c :: !e 
-    done in 
-    print_stats () ;
-    Gc.full_major () ; 
-    print_stats () ;
-    let t = time Gc.full_major () in
-    print_stats () ;
-    debug "gc took %f seconds" t 
-
-
-type i  = { uids : float list; visible : bool ; a : int ; }
-let test4 () = 
-  let i = (fun () -> ()) in
-  print_stats () ;
-  let j = Eternal.copy i in
-  print_stats () 
-
-
+ 
 let test5 () = 
-  let eternal = Eternal.create 10 in 
+  let eternal = Eternal.create 200000 in 
   Eternal.set eternal 0 [ 1; 2; 3] ; 
   let i = Eternal.get eternal 0 in
   List.iter print_int i
 
+type u = { uids : int list ; visible : bool } 
+
+
+let test6 () = 
+  let v = { uids = [ 1; 2; 4]; visible = false }  in 
+  let c = Eternal.copy v in
+  let u = Eternal.update c { uids = [ 4; 2; 1] ; visible = true } in 
+  debug "> %B %B" v.visible u.visible
+  
+
 let _ = 
-  test5 () ;  
+  test6 () ;  
   debug "> collected, exiting" 
     
   

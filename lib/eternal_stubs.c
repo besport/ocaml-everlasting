@@ -51,6 +51,78 @@
           Hd_hp (ptr) = Make_header (wosize, tag, Caml_black) ;\
           result = Val_hp (ptr) ;
 
+#define Free_small_nogc(result)\
+    free (result - 8 ) ;
+
+value ocaml_update (value legacy, value latest) {
+  if (Is_block (legacy) && Is_block (latest))  {
+    if (Tag_val (legacy) == Tag_val (latest)) 
+      {
+        switch (Tag_val(legacy)) 
+          {
+          case Closure_tag: { caml_invalid_argument("Can't update Closure_tag blocks") ; break; }
+          case Abstract_tag: { caml_invalid_argument("Can't update Abstract_tag blocks") ; break;  }
+          case Custom_tag: { caml_invalid_argument("Can't update Custom_tag blocks") ; break;  }
+            
+          case String_tag: { 
+            // printf ("string_tag\n");
+            
+            if (!strcmp (String_val (legacy), String_val (latest)))
+              return legacy ; 
+            else 
+              {
+                value result ;
+                mlsize_t wosize ; 
+                
+                wosize = (caml_string_length (latest) + sizeof (value)) / sizeof (value);
+                
+                Alloc_small_nogc(result, wosize, String_tag) ; 
+                  
+                memmove (String_val(result), String_val (latest), caml_string_length (latest)) ;
+                Free_small_nogc(legacy); 
+                
+                return result ;
+                
+              }
+          }
+            
+            
+          default: 
+            {
+              if (Wosize_val (legacy) == Wosize_val (latest)) 
+                {
+                  int i; 
+                  for (i=0; i < Wosize_val (legacy); i++)
+                    {
+                      value updated = ocaml_update (Field(legacy, i), Field(latest, i)) ; 
+                      if (updated != Field(legacy, i)) 
+                        Store_field (legacy, i, updated); 
+                    }; 
+                  
+                  return legacy ;
+                }
+              else 
+                {
+                  caml_invalid_argument("Legacy and latest have different wosizes") ; 
+                }
+            }
+          }
+        
+      }
+    else 
+      {
+        caml_invalid_argument("Legacy and latest have different tags") ; 
+      }
+  }
+  else if (Is_long (legacy) && Is_long (latest)) {
+    return latest ;
+  } 
+  else {
+    caml_invalid_argument("Legacy and latest have different block structures") ;
+  }
+}
+
+
 value ocaml_copy (value e) {
   
   // CAMLparam1(e) ;

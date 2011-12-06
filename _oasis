@@ -1,0 +1,28 @@
+OASISFormat: 0.1
+Name: ocaml-eternal
+Version: 0.0.1
+LicenseFile: COPYING
+License: PROP
+Authors: 
+BuildTools: ocamlbuild
+Plugins: DevFiles (0.2), META (0.2)
+Synopsis: gc experiments
+
+Flag server
+  Description: server 
+  Default: true
+
+Library eternal
+  Install$: true
+  Path: lib
+  ByteOpt: -thread
+  NativeOpt: -thread   
+  Modules: Eternal
+  BuildDepends: lwt
+  CSources: eternal_stubs.c
+  # CCLib : -lGeoIp
+
+Executable test
+  Path: test
+  BuildDepends: eternal
+  MainIs: main.ml

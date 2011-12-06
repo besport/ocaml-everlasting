@@ -1,0 +1,14 @@
+ocsidb
+data*
+*byte
+*native
+_build
+*~
+*#*
+*bug*
+*conf
+*keys*
+setup.log
+setup.data
+shm*
+*.scrum

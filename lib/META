@@ -1,0 +1,10 @@
+# OASIS_START
+# DO NOT EDIT (digest: 8dc6686a316f74015b4495f0fe9a57dc)
+version = "0.0.1"
+description = "gc experiments"
+requires = "lwt"
+archive(byte) = "eternal.cma"
+archive(native) = "eternal.cmxa"
+exists_if = "eternal.cma"
+# OASIS_STOP
+

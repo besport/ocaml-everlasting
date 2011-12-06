@@ -238,24 +238,43 @@ value ocaml_create (value size) {
 
 value ocaml_get (value e, value pos) {
   CAMLparam2(e, pos);
+  printf ("> get\n");   
   if (!(Eternal_val(e)->data[Int_val (pos)])) { caml_invalid_argument("There is no such element") ; }
   CAMLreturn (Eternal_val(e)->data[Int_val (pos)]) ; 
 }
 
 
 void ocaml_set (value e, value pos, value v) {
-  CAMLparam2(e, pos); 
-  
+  CAMLparam3(e, pos, v); 
+  printf ("> set\n");   
   int p = Int_val (pos) ;
   
   struct eternal *t = Eternal_val (e) ; 
   
-  (t->data) [ p ] = ocaml_copy (v) ; /* this does not work as gc relocate the values */
+  (t->data)[p] = ocaml_copy (v) ; /* this does not work as gc relocate the values */
 
   CAMLreturn0 ;
 }
 
 
 
+void ocaml_replace (value e, value pos, value v){
+  CAMLparam3 (e, pos, v); 
+  printf ("> replace\n"); 
+  
+  int p = Int_val (pos) ; 
+  struct eternal *t = Eternal_val (e) ; 
+ 
+  if ((t->data)[p])
+    {
+      (t->data)[p] = ocaml_update ((t->data)[p], v) ;
+    } 
+  else
+    {
+      (t->data)[p] = ocaml_copy (v) ; 
+    } 
+
+  CAMLreturn0 ; 
+}
 
 

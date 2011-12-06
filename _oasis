@@ -21,7 +21,7 @@ Library everlasting
   BuildDepends: 
   CSources: everlasting_stubs.c
 
-#Executable test
+# Executable test
 #  Path: test
 #  BuildDepends:  everlasting
 #  MainIs: main.ml

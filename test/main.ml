@@ -75,15 +75,13 @@ let test3 n =
     debug "gc took %f seconds" t 
 
 
-type i  = float array  
+type i  = { uids : float list; visible : bool ; a : int ; }
 let test4 () = 
-  let i = [| 0.0 ; 4.12; 12.21 |] in
+  let i = { uids = [ 1.0 ; 3.1 ; 1.4 ]; visible = true ; a = 12 } in
   print_stats () ;
   let j = Eternal.copy i in
-  Gc.full_major () ;
-  Gc.full_major () ;
   print_stats () ;
-  debug "> %d %f" (Array.length j) j.(2)
+  debug "> %d %B" (List.length j.uids) j.visible
 
 let _ = 
   test4 () ;  

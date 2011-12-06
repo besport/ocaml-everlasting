@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 901fd49969f737a981063e3a0182b051) *)
+(* DO NOT EDIT (digest: 0de91d8ebe76ef3f172797b8e79fe474) *)
 module OASISGettext = struct
 # 21 "/Users/hypios/reloaded/pub/oasis-0.2.0/src/oasis/OASISGettext.ml"
   
@@ -451,21 +451,22 @@ end
 open Ocamlbuild_plugin;;
 let package_default =
   {
-     MyOCamlbuildBase.lib_ocaml = [("lib/eternal", ["lib"])];
-     lib_c = [("eternal", "lib", [])];
+     MyOCamlbuildBase.lib_ocaml = [("lib/everlasting", ["lib"])];
+     lib_c = [("everlasting", "lib", [])];
      flags =
        [
-          (["oasis_library_eternal_byte"; "ocaml"; "link"; "byte"],
+          (["oasis_library_everlasting_byte"; "ocaml"; "link"; "byte"],
             [(OASISExpr.EBool true, S [A "-thread"])]);
-          (["oasis_library_eternal_native"; "ocaml"; "link"; "native"],
+          (["oasis_library_everlasting_native"; "ocaml"; "link"; "native"],
             [(OASISExpr.EBool true, S [A "-thread"])]);
-          (["oasis_library_eternal_byte"; "ocaml"; "ocamldep"; "byte"],
+          (["oasis_library_everlasting_byte"; "ocaml"; "ocamldep"; "byte"],
             [(OASISExpr.EBool true, S [A "-thread"])]);
-          (["oasis_library_eternal_native"; "ocaml"; "ocamldep"; "native"],
+          (["oasis_library_everlasting_native"; "ocaml"; "ocamldep"; "native"
+           ],
             [(OASISExpr.EBool true, S [A "-thread"])]);
-          (["oasis_library_eternal_byte"; "ocaml"; "compile"; "byte"],
+          (["oasis_library_everlasting_byte"; "ocaml"; "compile"; "byte"],
             [(OASISExpr.EBool true, S [A "-thread"])]);
-          (["oasis_library_eternal_native"; "ocaml"; "compile"; "native"],
+          (["oasis_library_everlasting_native"; "ocaml"; "compile"; "native"],
             [(OASISExpr.EBool true, S [A "-thread"])])
        ];
      }

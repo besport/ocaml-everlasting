@@ -1,19 +1,12 @@
 # OASIS_START
-# DO NOT EDIT (digest: 20c251fca9d5eddac21edd0d0a5be08c)
-# Library eternal
+# DO NOT EDIT (digest: 2763142574061330caff04d2347384a5)
+# Library everlasting
 "lib": include
-<lib/eternal.{cma,cmxa}>: oasis_library_eternal_byte
-<lib/*.ml{,i}>: oasis_library_eternal_byte
-"lib/eternal_stubs.c": oasis_library_eternal_byte
-<lib/eternal.{cma,cmxa}>: oasis_library_eternal_native
-<lib/*.ml{,i}>: oasis_library_eternal_native
-"lib/eternal_stubs.c": oasis_library_eternal_native
-<lib/eternal.{cma,cmxa}>: use_libeternal
-<lib/*.ml{,i}>: pkg_unix
-"lib/eternal_stubs.c": pkg_unix
-# Executable test
-"test/main.byte": use_eternal
-"test/main.byte": pkg_unix
-<test/*.ml{,i}>: use_eternal
-<test/*.ml{,i}>: pkg_unix
+<lib/everlasting.{cma,cmxa}>: oasis_library_everlasting_byte
+<lib/*.ml{,i}>: oasis_library_everlasting_byte
+"lib/everlasting_stubs.c": oasis_library_everlasting_byte
+<lib/everlasting.{cma,cmxa}>: oasis_library_everlasting_native
+<lib/*.ml{,i}>: oasis_library_everlasting_native
+"lib/everlasting_stubs.c": oasis_library_everlasting_native
+<lib/everlasting.{cma,cmxa}>: use_libeverlasting
 # OASIS_STOP

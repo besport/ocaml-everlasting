@@ -1,10 +1,9 @@
 # OASIS_START
-# DO NOT EDIT (digest: f360504d9e10a1658088e6bb2c5d9093)
+# DO NOT EDIT (digest: f126120155ac35a5f7d8e8db5c9495fd)
 version = "0.0.1"
 description = "gc experiments"
-requires = "unix"
-archive(byte) = "eternal.cma"
-archive(native) = "eternal.cmxa"
-exists_if = "eternal.cma"
+archive(byte) = "everlasting.cma"
+archive(native) = "everlasting.cmxa"
+exists_if = "everlasting.cma"
 # OASIS_STOP
 

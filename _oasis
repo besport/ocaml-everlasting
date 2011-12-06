@@ -1,5 +1,5 @@
 OASISFormat: 0.1
-Name: ocaml-eternal
+Name: ocaml-everlasting
 Version: 0.0.1
 LicenseFile: COPYING
 License: PROP
@@ -12,17 +12,16 @@ Flag server
   Description: server 
   Default: true
 
-Library eternal
+Library everlasting
   Install$: true
   Path: lib
   ByteOpt: -thread
   NativeOpt: -thread   
-  Modules: Eternal
-  BuildDepends: unix
-  CSources: eternal_stubs.c
-  # CCLib : -lGeoIp
+  Modules: Everlasting
+  BuildDepends: 
+  CSources: everlasting_stubs.c
 
-Executable test
-  Path: test
-  BuildDepends: eternal
-  MainIs: main.ml
+#Executable test
+#  Path: test
+#  BuildDepends:  everlasting
+#  MainIs: main.ml

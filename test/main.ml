@@ -8,9 +8,9 @@ let time f () =
 
  
 let test5 () = 
-  let eternal = Eternal.create 200000 in 
-  Eternal.set eternal 0 [ 1; 2; 3] ; 
-  let i = Eternal.get eternal 0 in
+  let everlasting = Everlasting.create 200000 in 
+  Everlasting.set everlasting 0 [ 1; 2; 3] ; 
+  let i = Everlasting.get everlasting 0 in
   List.iter print_int i
 
 type u = { uids : int list ; visible : bool } 
@@ -18,8 +18,8 @@ type u = { uids : int list ; visible : bool }
 
 let test6 () = 
   let v = { uids = [ 1; 2; 4]; visible = false }  in 
-  let c = Eternal.copy v in
-  let u = Eternal.update c { uids = [ 4; 2; 1] ; visible = true } in 
+  let c = Everlasting.copy v in
+  let u = Everlasting.update c { uids = [ 4; 2; 1] ; visible = true } in 
   debug "> %B %B" v.visible u.visible
   
 

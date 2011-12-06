@@ -17,7 +17,7 @@
 // type definition 
 struct eternal 
 {
-  void *data ;
+  value **data ;
 
 }; 
 
@@ -49,13 +49,35 @@ value alloc_eternal (struct eternal *t) {
 
 // Create the context 
 
-value ocaml_create_eternal (value unit) {
-  CAMLparam1(unit);
+value ocaml_create (value size) {
+  CAMLparam1(size);
 
   struct eternal *t = (struct eternal *)malloc ((sizeof (struct eternal))) ; 
-  t->data = 0 ; 
+  t->data = (value **)malloc (sizeof (value **) * Int_val(size)) ; 
   CAMLreturn (alloc_eternal (t)); 
 }
+
+// Get and set
+
+value ocaml_unsafe_get (value e, value pos) {
+  CAMLparam2(e, pos); 
+  CAMLreturn(*(Eternal_val(e)->data[Int_val (pos)])) ; 
+}
+
+
+void ocaml_set (value e, value pos, value v) {
+  CAMLparam3(e, pos, v); 
+  
+  int p = Int_val (pos) ;
+  struct eternal *t = Eternal_val (e) ; 
+  
+  (t->data) [ p ] = &v ;
+
+  caml_register_global_root(&v) ;  
+  CAMLreturn0 ;
+}
+
+
 
 /*
 

@@ -55,6 +55,86 @@
 #define Free_small_nogc(result)\
     free (result - 8 ) ;
 
+
+value ocaml_copy (value e) {
+  
+  // CAMLparam1(e) ;
+  if Is_block (e) 
+    {
+      // Handling block
+      //printf ("it's a block\n") ;
+      switch (Tag_val(e))
+        {
+        case Closure_tag: { caml_invalid_argument("Can't copy Closure_tag blocks") ; break; }
+        case String_tag: { 
+          // printf ("string_tag\n");
+          
+          value result ; 
+          mlsize_t wosize ; 
+
+          wosize = (caml_string_length (e) + sizeof (value)) / sizeof (value);
+          
+          Alloc_small_nogc(result, wosize, String_tag)
+            
+          memmove (String_val(result), String_val (e), caml_string_length (e)) ;  
+          return result ;
+          
+        }
+        case Double_tag: {
+          printf ("double_tag\n");
+          value result ; 
+          Alloc_small_nogc(result, Double_wosize, Double_tag); 
+          Store_double_val (result, Double_val (e)); 
+          return result ; 
+        }
+        case Double_array_tag: 
+          {
+            printf ("double array tag\n");
+            value result ;
+            Alloc_small_nogc(result, Wosize_val (e), Double_array_tag); 
+            int i; 
+            for (i=0; i < Wosize_val (e); i++)
+              {
+                Store_double_field(result, i, Double_field(e, i)); 
+              }; 
+            return result; 
+          }
+        case Abstract_tag: { caml_invalid_argument("Can't copy Abstract_tag blocks") ; break;  }
+        case Custom_tag: { 
+          printf ("custom tag\n"); 
+          value result ; 
+          
+          // Copying custom tags. it might be the tricky part 
+          Alloc_small_nogc(result, Wosize_val (e), Custom_tag);
+          Custom_ops_val(result) = Custom_ops_val(e); // I imagine that it's a global value
+          
+          // Copying the custom data 
+          memmove(Data_custom_val(result), Data_custom_val(e), Wosize_val(e)) ; 
+          
+          return result;  }
+        default: 
+          {
+            printf ("> code\n"); 
+            value result; 
+            Alloc_small_nogc(result, Wosize_val (e), Tag_val (e)) ; 
+            int i; 
+            for (i=0; i < Wosize_val (e); i++)
+              {
+                Store_field (result, i, ocaml_copy (Field (e, i))); 
+              }; 
+              
+            return result ;
+          }
+        }
+      
+    }
+  else 
+    {
+      return e ; 
+    }
+}
+
+
 value ocaml_update (value legacy, value latest) {
   if (Is_block (legacy) && Is_block (latest))  {
     if (Tag_val (legacy) == Tag_val (latest)) 
@@ -142,88 +222,16 @@ value ocaml_update (value legacy, value latest) {
     return latest ;
   } 
   else {
-    caml_invalid_argument("Legacy and latest have different block structures") ;
+    if (Is_block (legacy)) Free_small_nogc(legacy) ;
+    value result ; 
+    result = ocaml_copy (latest); 
+    return result ; 
   }
 }
 
 
-value ocaml_copy (value e) {
-  
-  // CAMLparam1(e) ;
-  if Is_block (e) 
-    {
-      // Handling block
-      //printf ("it's a block\n") ;
-      switch (Tag_val(e))
-        {
-        case Closure_tag: { caml_invalid_argument("Can't copy Closure_tag blocks") ; break; }
-        case String_tag: { 
-          // printf ("string_tag\n");
-          
-          value result ; 
-          mlsize_t wosize ; 
 
-          wosize = (caml_string_length (e) + sizeof (value)) / sizeof (value);
-          
-          Alloc_small_nogc(result, wosize, String_tag)
-            
-          memmove (String_val(result), String_val (e), caml_string_length (e)) ;  
-          return result ;
-          
-        }
-        case Double_tag: {
-          printf ("double_tag\n");
-          value result ; 
-          Alloc_small_nogc(result, Double_wosize, Double_tag); 
-          Store_double_val (result, Double_val (e)); 
-          return result ; 
-        }
-        case Double_array_tag: 
-          {
-            printf ("double array tag\n");
-            value result ;
-            Alloc_small_nogc(result, Wosize_val (e), Double_array_tag); 
-            int i; 
-            for (i=0; i < Wosize_val (e); i++)
-              {
-                Store_double_field(result, i, Double_field(e, i)); 
-              }; 
-            return result; 
-          }
-        case Abstract_tag: { caml_invalid_argument("Can't copy Abstract_tag blocks") ; break;  }
-        case Custom_tag: { 
-          printf ("custom tag\n"); 
-          value result ; 
-          
-          // Copying custom tags. it might be the tricky part 
-          Alloc_small_nogc(result, Wosize_val (e), Custom_tag);
-          Custom_ops_val(result) = Custom_ops_val(e); // I imagine that it's a global value
-          
-          // Copying the custom data 
-          memmove(Data_custom_val(result), Data_custom_val(e), Wosize_val(e)) ; 
-          
-          return result;  }
-        default: 
-          {
-            printf ("> code\n"); 
-            value result; 
-            Alloc_small_nogc(result, Wosize_val (e), Tag_val (e)) ; 
-            int i; 
-            for (i=0; i < Wosize_val (e); i++)
-              {
-                Store_field (result, i, ocaml_copy (Field (e, i))); 
-              }; 
-              
-            return result ;
-          }
-        }
-      
-    }
-  else 
-    {
-      return e ; 
-    }
-}
+// the everlasting lib
 
 
 // type definition 

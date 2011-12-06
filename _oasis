@@ -18,7 +18,7 @@ Library eternal
   ByteOpt: -thread
   NativeOpt: -thread   
   Modules: Eternal
-  BuildDepends: lwt
+  BuildDepends: unix
   CSources: eternal_stubs.c
   # CCLib : -lGeoIp
 

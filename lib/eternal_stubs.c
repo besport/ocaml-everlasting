@@ -14,6 +14,28 @@
 #include <caml/fail.h>
 
 
+
+#ifndef CAML_GC_H
+#define CAML_GC_H
+
+
+#define Caml_white (0 << 8)
+#define Caml_gray  (1 << 8)
+#define Caml_blue  (2 << 8)
+#define Caml_black (3 << 8)
+
+#define Color_hd(hd) ((color_t) ((hd) & Caml_black))
+#define Color_hp(hp) (Color_hd (Hd_hp (hp)))
+#define Color_val(val) (Color_hd (Hd_val (val)))
+
+#define Is_white_hd(hd) (Color_hd (hd) == Caml_white)
+#define Is_gray_hd(hd) (Color_hd (hd) == Caml_gray)
+#define Is_blue_hd(hd) (Color_hd (hd) == Caml_blue)
+#define Is_black_hd(hd) (Color_hd (hd) == Caml_black)
+
+
+#endif
+
 // type definition 
 struct eternal 
 {
@@ -57,6 +79,20 @@ value ocaml_create (value size) {
   CAMLreturn (alloc_eternal (t)); 
 }
 
+// create eternal references 
+
+value ocaml_t1 (value v) {
+  CAMLparam1 (v); 
+  CAMLlocal1 (b) ; 
+  b = caml_alloc (1, 0) ;
+  caml_register_global_root(&b) ;
+
+  printf ("--> tag white %d gray %d  blue %d   black %d  %d\n", Caml_white, Caml_gray, Caml_blue, Caml_black, Color_val(v));  
+   
+  Store_field (b, 0, v); 
+  CAMLreturn (b) ;
+}
+
 // Get and set
 
 value ocaml_unsafe_get (value e, value pos) {
@@ -66,17 +102,28 @@ value ocaml_unsafe_get (value e, value pos) {
 
 
 void ocaml_set (value e, value pos, value v) {
-  CAMLparam3(e, pos, v); 
+  CAMLparam2(e, pos); 
   
   int p = Int_val (pos) ;
+  
+  printf ("--> tag white %d gray %d  blue %d   black %d  %d\n", Caml_white, Caml_gray, Caml_blue, Caml_black, Color_val(v));  
+  
   struct eternal *t = Eternal_val (e) ; 
   
-  (t->data) [ p ] = &v ;
+  (t->data) [ p ] = &v ; /* this does not work as gc relocate the values */
 
-  caml_register_global_root(&v) ;  
   CAMLreturn0 ;
 }
 
+
+value ocaml_copy (value e) {
+  // CAMLparam1(e) ; 
+  
+  
+  
+  return (e) ; 
+
+}
 
 
 /*

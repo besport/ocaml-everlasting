@@ -163,14 +163,23 @@ value ocaml_copy (value e) {
         case Custom_tag: { printf ("closure_tag\n"); break;  }
         default: 
           {
-            printf ("> default, it's a block (%d) %d", No_scan_tag, Tag_val(e)); 
-            return e ;
+            printf ("> code\n"); 
+            value result; 
+            Alloc_small_nogc(result, Wosize_val (e), Tag_val (e)) ; 
+            int i; 
+            for (i=0; i < Wosize_val (e); i++)
+              {
+                Store_field (result, i, ocaml_copy (Field (e, i))); 
+              }; 
+              
+            return result ;
           }
         }
       
     }
   else 
     {
+      printf ( "straight\n" ); 
      
       return e ; 
     }
@@ -186,41 +195,5 @@ value ocaml_copy (value e) {
           Store_field (b, i, ocaml_copy (Field (e, i))); 
         }; 
       return b ;
-// Perform the lookup 
-
-static const char * _mk_NA( const char * p ){
- return p ? p : "N/A";
-}
-
-value ocaml_GeoIP_record_by_addr (value context, value address){
-  CAMLparam2(context, address); 
-  CAMLlocal1(result) ; 
-  
-  GeoIPRecord *gir = GeoIP_record_by_addr (Context_val(context), String_val (address)) ;
-
-  if (gir == NULL) caml_failwith("Can't initialize gir") ;
-  
-  result = caml_alloc (6 ,0);
-
-  Store_field(result, 0, (caml_copy_string(_mk_NA (gir->country_code)))); 
-  Store_field(result, 1, (caml_copy_string(_mk_NA (gir->country_code3))));
-  Store_field(result, 2, (caml_copy_string(_mk_NA (gir->country_name))));
-  Store_field(result, 3, (caml_copy_string(_mk_NA (gir->city))));
-  Store_field(result, 4, (caml_copy_double(gir->latitude)));
-  Store_field(result, 5, (caml_copy_double(gir->longitude)));
-  
-
-     Store_field(result, 5, (caml_copy_string(gir->postal_code))); 
-     Store_field(result, 7, (caml_copy_int32(gir->metro_code)));
-     Store_field(result, 8, (caml_copy_int32(gir->dma_code)));
-     Store_field(result, 9, (caml_copy_int32(gir->area_code)));
-     Store_field(result, 10, (caml_copy_int32(gir->charset)));
-     Store_field(result, 11, (caml_copy_string(gir->continent_code)));
-
-
-  GeoIPRecord_delete(gir);
-  CAMLreturn (result) ;
-}
-
 
 */

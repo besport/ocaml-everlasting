@@ -73,18 +73,17 @@ let test3 n =
     print_stats () ;
     debug "gc took %f seconds" t 
 
+type t = { cnt : string } 
 
 let test4 () = 
-  let i = "coucoucc" in 
-  let j = Eternal.copy i in 
-  let l = String.length j in 
-  debug "> length %d" l ; 
-  debug "> %s %d %s" i (String.length j) j 
+  let i = { cnt = "coucou" } in 
+  print_stats () ;
+  let j = Eternal.copy i in
+  print_stats () ;
+  debug "> %s" j.cnt 
 
 let _ = 
   test4 () ; 
-  test3 100000 ; 
-  test3 1000000 ; 
   debug "> collected, exiting" 
     
   

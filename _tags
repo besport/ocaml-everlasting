@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 2763142574061330caff04d2347384a5)
+# DO NOT EDIT (digest: d36598f7b2dcd4a03a48d9b3aabd4d15)
 # Library everlasting
 "lib": include
 <lib/everlasting.{cma,cmxa}>: oasis_library_everlasting_byte
@@ -9,4 +9,11 @@
 <lib/*.ml{,i}>: oasis_library_everlasting_native
 "lib/everlasting_stubs.c": oasis_library_everlasting_native
 <lib/everlasting.{cma,cmxa}>: use_libeverlasting
+<lib/*.ml{,i}>: pkg_unix
+"lib/everlasting_stubs.c": pkg_unix
+# Executable test
+"test/main.byte": use_everlasting
+"test/main.byte": pkg_unix
+<test/*.ml{,i}>: use_everlasting
+<test/*.ml{,i}>: pkg_unix
 # OASIS_STOP

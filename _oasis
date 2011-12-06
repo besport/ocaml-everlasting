@@ -18,10 +18,10 @@ Library everlasting
   ByteOpt: -thread
   NativeOpt: -thread   
   Modules: Everlasting
-  BuildDepends: 
+  BuildDepends: unix
   CSources: everlasting_stubs.c
 
-# Executable test
-#  Path: test
-#  BuildDepends:  everlasting
-#  MainIs: main.ml
+Executable test
+  Path: test
+  BuildDepends:  everlasting
+  MainIs: main.ml

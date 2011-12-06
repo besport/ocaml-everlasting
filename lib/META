@@ -1,7 +1,8 @@
 # OASIS_START
-# DO NOT EDIT (digest: f126120155ac35a5f7d8e8db5c9495fd)
+# DO NOT EDIT (digest: 82e6bc7c4cd78c137fb98645f214c74e)
 version = "0.0.1"
 description = "gc experiments"
+requires = "unix"
 archive(byte) = "everlasting.cma"
 archive(native) = "everlasting.cmxa"
 exists_if = "everlasting.cma"

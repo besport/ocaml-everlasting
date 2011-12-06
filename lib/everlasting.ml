@@ -3,6 +3,9 @@ type 'a t
       
 external create : int -> 'a t = "ocaml_create"
 
+
+(* when calling set, the value shouldn't have been created in the call *)
+
 external set : 'a t -> int -> 'a -> unit = "ocaml_set"  
 external get : 'a t -> int -> 'a  = "ocaml_get"
 external replace : 'a t -> int -> 'a -> unit = "ocaml_replace"

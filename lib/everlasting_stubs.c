@@ -167,7 +167,18 @@ value ocaml_copy (value e) {
             return result; 
           }
         case Abstract_tag: { caml_invalid_argument("Can't copy Abstract_tag blocks") ; break;  }
-        case Custom_tag: { caml_invalid_argument("Can't copy Custom_tag blocks") ; break;  }
+        case Custom_tag: { 
+          printf ("custom tag\n"); 
+          value result ; 
+          
+          // Copying custom tags. it might be the tricky part 
+          Alloc_small_nogc(result, Wosize_val (e), Custom_tag);
+          Custom_ops_val(result) = Custom_ops_val(e); // I imagine that it's a global value
+          
+          // Copying the custom data 
+          memmove(Data_custom_val(result), Data_custom_val(e), Wosize_val(e)) ; 
+          
+          return result;  }
         default: 
           {
             printf ("> code\n"); 

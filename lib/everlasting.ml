@@ -1,6 +1,6 @@
 
 type 'a t
-      
+(*      
 external create : int -> 'a t = "ocaml_create"
 
 
@@ -15,4 +15,11 @@ external replace : 'a t -> int -> 'a -> unit = "ocaml_replace"
 external copy : 'a -> 'a = "ocaml_copy" 
 (** update an element outside of the heap with an element inside the heap *)
 external update : 'a -> 'a -> 'a = "ocaml_update"    
-   
+*)   
+
+
+let create n = Hashtbl.create n 
+let set = Hashtbl.add 
+let get = Hashtbl.find
+
+let replace = Hashtbl.replace

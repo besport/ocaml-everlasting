@@ -23,3 +23,4 @@ let set = Hashtbl.add
 let get = Hashtbl.find
 
 let replace = Hashtbl.replace
+let remove = Hashtbl.remove

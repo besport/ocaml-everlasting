@@ -22,6 +22,7 @@ Library everlasting
   CSources: everlasting_stubs.c
 
 Executable test
+  Install$: false
   Path: test
   BuildDepends:  everlasting
   MainIs: main.ml
